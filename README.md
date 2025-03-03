@@ -1,8 +1,8 @@
-# TP Dauphine 2425
+# TP Dauphine 24/25
 
-## Getting Started
+## Getting started
 
-### Fork the Project
+### Fork the project
 
 Click on the "Fork" button at the top right of the page to create a copy of the repository under your own GitHub account.
 
@@ -32,7 +32,7 @@ Or
 python -m venv {name_of_your_venv}
 ```
 
-### 2: Activate the Virtual Environment
+### 2: Activate the virtual environment
 
 Activating your virtual environment ensures that the dependencies you install will only affect this project:
 
@@ -50,7 +50,7 @@ on Windows:
 
 You should see the name of your environment on the left of your terminal, indicating that it is active.
 
-### 3: Install the Required Dependencies
+### 3: Install the required dependencies
 
 Install the project's dependencies listed in the `requirements.txt` file:
 
@@ -78,16 +78,27 @@ Feel free to play with Streamlit's widgets!
 
 Follow the steps below to set up your environment, run the provided scripts, and build your own API and graphical interface using Streamlit.
 
-### 1. Obtain a Cohere API Key
+### 1. Create a dotenv file
+
+At the root of the project, create a `.env` file that contains the following line:
+
+```plaintext
+PYTHONPATH=.
+```
+
+### 2. Obtain a Cohere API Key
 
 - Visit the [Cohere website](https://cohere.ai) and sign up for an API key.
-- Once obtained, store this API key in a `.env` file in the root directory of your project. The file should look something like this:
+- Once obtained, store this API key in the `.env` file you created just before. 
 
-  ```plaintext
-  COHERE_API_KEY=your_api_key_here
-  ```
+`.env` should now look like this:
 
-### 2. Play with Cohere through a FastAPI server
+```plaintext
+PYTHONPATH=.
+COHERE_API_KEY=your_api_key_here
+```
+
+### 3. Play with Cohere through a FastAPI server
 
 To start the FastAPI server, run the following command:
 
@@ -103,7 +114,7 @@ You can then try the chat endpoint using the "Try it out!" button and replacing 
 
 ![alt text](assets/img/swagger_chat_endpoint.png)
 
-### 3. Use Cohere within Streamlit
+### 4. Use Cohere within Streamlit
 
 At the root of this folder, ``main.py`` can be used to launch both the Streamlit and the FastAPI servers.
 
@@ -123,7 +134,7 @@ You'll be able to give this history to Cohere to give more context to your conve
 
 Going further, what if we were able to give Cohere some documents to generate a more appropriate answer? You can freely use the datas in [assets](./assets/dataset).
 
-## Special Thanks
+## Special thanks
 
 A special thanks to William Hoareau for his work on a project that served as the foundation for my initial commit
 
