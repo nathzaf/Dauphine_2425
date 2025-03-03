@@ -99,7 +99,7 @@ You can interact with your API using SwaggerUI, which is automatically provided 
 
 Access SwaggerUI by navigating to [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-Feel free to try the chat endpoint using the "Try it out!" button and replacing the text in the _prompt_ field.
+You can then try the chat endpoint using the "Try it out!" button and replacing the text in the _prompt_ field.
 
 ![alt text](assets/img/swagger_chat_endpoint.png)
 
@@ -121,7 +121,7 @@ Using the current project architecture, create a new service to handle the histo
 
 You'll be able to give this history to Cohere to give more context to your conversation (see [cohere API documentation](https://docs.cohere.com/v1/reference/chat#request.body.chat_history)).
 
-Going further, what if we were able to give some documents that Cohere could use to generate a more appropriate answer? You can freely use the datas in [assets](./assets/dataset).
+Going further, what if we were able to give Cohere some documents to generate a more appropriate answer? You can freely use the datas in [assets](./assets/dataset).
 
 ## Special Thanks
 
