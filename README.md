@@ -20,7 +20,7 @@ git clone https://github.com/{your_username}/Dauphine_2425.git
 
 Follow these steps to set up the project on your local machine:
 
-### Step 1: Create a Python Virtual Environment
+### 1: Create a Python Virtual Environment
 
 Creating a virtual environment helps to manage dependencies and avoid conflicts with other projects:
 
@@ -32,15 +32,17 @@ Or
 python -m venv {name_of_your_venv}
 ```
 
-### Step 2: Activate the Virtual Environment
+### 2: Activate the Virtual Environment
 
 Activating your virtual environment ensures that the dependencies you install will only affect this project:
+
+on MacOS/Linux:
 
 ```bash
 source {name_of_your_venv}/bin/activate
 ```
 
-Windows:
+on Windows:
 
 ```bash
 {name_of_your_venv}\Scripts\activate
@@ -48,7 +50,7 @@ Windows:
 
 You should see the name of your environment on the left of your terminal, indicating that it is active.
 
-### Step 3: Install the Required Dependencies
+### 3: Install the Required Dependencies
 
 Install the project's dependencies listed in the `requirements.txt` file:
 
@@ -58,7 +60,7 @@ pip install -r requirements.txt
 
 This will install all the necessary packages to run the project. This may take a few minutes.
 
-### Step 4: Launch the frontend
+### 4: Launch the frontend
 
 Ensure you are working within your activated Python environment to avoid issues. Launch the frontend of the project using Streamlit:
 
@@ -85,7 +87,7 @@ Follow the steps below to set up your environment, run the provided scripts, and
   COHERE_API_KEY=your_api_key_here
   ```
 
-### 2. Set up and run the FastAPI server
+### 2. Play with Cohere through a FastAPI server
 
 To start the FastAPI server, run the following command:
 
