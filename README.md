@@ -97,11 +97,7 @@ uvicorn rest.api:rest_api
 
 You can interact with your API using SwaggerUI, which is automatically provided by FastAPI, or using a tool like Postman.
 
-Access SwaggerUI by navigating to:
-
-```bash
-http://127.0.0.1:8000/docs
-```
+Access SwaggerUI by navigating to [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
 Feel free to try the chat endpoint using the "Try it out!" button and replacing the text in the _prompt_ field.
 
