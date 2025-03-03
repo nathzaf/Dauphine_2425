@@ -35,7 +35,7 @@ st.markdown(
         )
 
 #FastAPI created at 
-api_url="http://127.0.0.1:8000/chat"
+api_url="https://dauphine-2425-gb-forked-1.onrender.com/chat"
 
 # Code copied from https://github.com/streamlit/llm-examples/blob/main/Chatbot.py
 # Initialize the chat history
