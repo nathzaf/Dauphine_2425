@@ -1,3 +1,11 @@
+import sys
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+sys.path.append(os.getenv('PYTHONPATH'))
+
 import streamlit as st
 import requests
 
