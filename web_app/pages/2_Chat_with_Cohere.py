@@ -20,9 +20,7 @@ with st.sidebar:
     st.markdown("""
                 This page demonstrates how to create a memory-enabled chatbot using Cohere, showcasing
                 the integration of advanced NLP capabilities in a user-friendly interface. Explore the 
-                examples and learn how to build your own intelligent applications.
-
-                Please follow the instructions provided [here](https://github.com/gbaratie/Dauphine_2425/tree/main/Cohere)     
+                examples and learn how to build your own intelligent applications.     
                 """)
     st.header("📚 Learn More")
     st.markdown("""Explore the examples and learn how to build your own intelligent applications.
