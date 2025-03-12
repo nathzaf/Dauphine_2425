@@ -1,0 +1,12 @@
+{
+    "default": [
+        {
+            "role": "user",
+            "content": "Je m'appelle Guillaume"
+        },
+        {
+            "role": "assistant",
+            "content": "Bonjour Guillaume."
+        }
+    ]
+}
