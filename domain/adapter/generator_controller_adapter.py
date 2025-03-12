@@ -3,10 +3,7 @@ from domain.service.text_generation_service import TextGenerationService
 from domain.service.history_service import HistoryService
 
 class GeneratorControllerAdapter(GeneratorControllerPort):
-    
-    def __init__(self,
-                text_generation_service: TextGenerationService,
-                history_service: HistoryService):
+    def __init__(self, text_generation_service: TextGenerationService, history_service: HistoryService):
         self.text_generation_service = text_generation_service
         self.history_service = history_service
         
