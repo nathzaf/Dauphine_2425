@@ -13,7 +13,7 @@ class CohereTextGenerator():
     def generate_text(self, prompt: str) -> str:
         response = self.client.chat(
             model="command-r-plus-08-2024",
-            chat_history=chat_history,
+            # chat_history=chat_history,
             messages=[
                 {"role": "system", "content": "You are an assistant, helping the user named Barat, and you answer him using rap lyrics."},
                 {"role": "user", "content": prompt}]
