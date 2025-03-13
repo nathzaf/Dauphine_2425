@@ -5,13 +5,12 @@ import os
 from multiprocessing import Process
 
 def run_uvicorn():
-PORT = int(os.getenv("PORT", 8000))  # Render définit un PORT dynamique
-uvicorn.run("rest.api:rest_api", host="0.0.0.0", port=PORT)
+    uvicorn.run("rest.api:rest_api", host="127.0.0.1", port=8000)
 
 def run_streamlit():
     # Construct the absolute path to Home.py
-    PORT = int(os.getenv("PORT", 8501))  # Streamlit utilise 8501 par défaut
-    subprocess.run(["streamlit", "run", home_py_path, "--server.address", "0.0.0.0", "--server.port", str(PORT)])
+    home_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'web_app/Home.py'))
+    subprocess.run(["streamlit", "run", home_py_path])
 
 if __name__ == "__main__":
     p1 = Process(target=run_uvicorn)
