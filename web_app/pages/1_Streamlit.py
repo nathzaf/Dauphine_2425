@@ -75,6 +75,7 @@ with st.sidebar:
         This sidebar contains links to additional resources:
         
         - [Streamlit Documentation](https://docs.streamlit.io)
+        - [Langchain Documentation](https://langchain.readthedocs.io)
         - [FastAPI Documentation](https://fastapi.tiangolo.com)
         
         Explore these to expand your knowledge and improve your applications!
