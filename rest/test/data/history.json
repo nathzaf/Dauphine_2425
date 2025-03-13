@@ -1,0 +1,148 @@
+[
+  {
+    "chat_id": "uuid-chat-1",
+    "chat_history": [
+      {
+        "role": "USER",
+        "message": "Who discovered gravity?"
+      },
+      {
+        "role": "CHATBOT",
+        "message": "The man who is widely credited with discovering gravity is Sir Isaac Newton"
+      }
+    ]
+  },
+  {
+    "chat_id": "uuid-chat-2",
+    "chat_history": [
+      [
+        {
+          "role": "USER",
+          "message": "What is the capital of France?"
+        },
+        {
+          "role": "CHATBOT",
+          "message": "The capital of France is Paris"
+        }
+      ]
+    ]
+  },
+  {
+    "chat_id": "054b80d0-af54-4773-836a-dc71dbf0fcb0",
+    "chat_history": [
+      {
+        "role": "USER",
+        "message": "Hello, my name is Kim."
+      },
+      {
+        "role": "CHATBOT",
+        "message": "Error: 500 Server Error: Internal Server Error for url: http://127.0.0.1:8000/chat"
+      }
+    ]
+  },
+  {
+    "chat_id": "9d7d6964-0f05-41e3-b06f-f7e31faef349",
+    "chat_history": [
+      {
+        "role": "USER",
+        "message": "Hello, my name is Kim."
+      },
+      {
+        "role": "CHATBOT",
+        "message": "Hello Kim! It's nice to meet you. How can I assist you today? Whether you have questions, need help with a task, or just want to chat, I'm here to help!"
+      },
+      {
+        "role": "USER",
+        "message": "Can you recall my name ? "
+      },
+      {
+        "role": "CHATBOT",
+        "message": "As an AI, I don't have the ability to recall personal information unless it has been provided in the current conversation. If you've mentioned your name earlier in our chat, feel free to remind me, and I'll be happy to use it! Otherwise, you can introduce yourself, and I'll make sure to address you by name moving forward."
+      }
+    ]
+  },
+  {
+    "chat_id": "9a1e9162-3a10-4a95-8793-2aaac5cd35c2",
+    "chat_history": [
+      {
+        "role": "USER",
+        "message": "Hello, my name is Kim."
+      },
+      {
+        "role": "CHATBOT",
+        "message": "Hello Kim! It's nice to meet you. How can I assist you today? Whether you have questions, need help with a task, or just want to chat, I'm here for you!"
+      },
+      {
+        "role": "USER",
+        "message": "Can you recall my name ?"
+      },
+      {
+        "role": "CHATBOT",
+        "message": "As an AI, I don't have the ability to recall personal information unless it has been provided in the current conversation. If you'd like, you can share your name, and I'll be happy to use it in our conversation!"
+      }
+    ]
+  },
+  {
+    "chat_id": "51796b41-c52f-4545-9c1b-1267c9cd6345",
+    "chat_history": [
+      {
+        "role": "USER",
+        "message": "Hello, my name is Kim."
+      },
+      {
+        "role": "CHATBOT",
+        "message": "Hello Kim! It's nice to meet you. How can I assist you today? Whether you have questions, need help with a task, or just want to chat, I'm here for you!"
+      },
+      {
+        "role": "USER",
+        "message": "Can you recall my name ? "
+      },
+      {
+        "role": "CHATBOT",
+        "message": "As an AI, I don't have the ability to recall personal information unless it has been provided in the current conversation. If you've mentioned your name earlier in our chat, feel free to remind me, and I'll be happy to use it! Otherwise, you can introduce yourself, and I'll make sure to address you by name moving forward."
+      }
+    ]
+  },
+  {
+    "chat_id": "1346b06c-3541-480d-8f95-ac341536d3d2",
+    "chat_history": [
+      {
+        "role": "USER",
+        "message": "Hello, my name is Kim."
+      },
+      {
+        "role": "CHATBOT",
+        "message": "Hello Kim! It's nice to meet you. How can I assist you today? Whether you have questions, need help with a task, or just want to chat, I'm here for you!"
+      },
+      {
+        "role": "USER",
+        "message": "Can you recall my name ? "
+      },
+      {
+        "role": "CHATBOT",
+        "message": "As an AI, I don't have the ability to recall personal information unless it has been provided in the current conversation. If you've mentioned your name earlier in our chat, feel free to remind me, and I'll be happy to address you by it!"
+      }
+    ]
+  },
+  {
+    "chat_id": "ef8fa35b-ffd2-4faf-a1d1-7ccd40b0adea",
+    "chat_history": [
+      {
+        "role": "USER",
+        "message": "My name is Kim."
+      },
+      {
+        "role": "CHATBOT",
+        "message": "Hello, Kim! It's nice to meet you. How can I assist you today? Whether you have questions, need help with a task, or just want to chat, I'm here for you."
+      },
+      {
+        "role": "USER",
+        "message": "Can you recall my name ?"
+      },
+      {
+        "role": "CHATBOT",
+        "message": "As an AI, I don't have the ability to recall personal information unless it has been provided in the current conversation. If you'd like, you can share your name, and I'll do my best to address you by it!"
+      }
+    ]
+  }
+]

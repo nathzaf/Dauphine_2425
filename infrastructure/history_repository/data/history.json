@@ -1,0 +1,45 @@
+[
+  {
+    "chat_id": "uuid-chat-1",
+    "chat_history": [
+      [
+        {
+          "role": "USER",
+          "message": "Who discovered gravity?"
+        },
+        {
+          "role": "CHATBOT",
+          "message": "The man who is widely credited with discovering gravity is Sir Isaac Newton"
+        }
+      ]
+    ]
+  },
+  {
+    "chat_id": "uuid-chat-2",
+    "chat_history": [
+      [
+        {
+          "role": "USER",
+          "message": "What is the capital of France?"
+        },
+        {
+          "role": "CHATBOT",
+          "message": "The capital of France is Paris"
+        }
+      ]
+    ]
+  },
+  {
+    "chat_id": "test-chat-uuid",
+    "chat_history": [
+      {
+        "role": "USER",
+        "message": "Hello"
+      },
+      {
+        "role": "CHATBOT",
+        "message": "Hi there!"
+      }
+    ]
+  }
+]

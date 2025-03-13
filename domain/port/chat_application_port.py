@@ -1,12 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod, ABC
 
 from domain.model.history import History
-from rest.model.role_message_request import RoleMessageRequest
 
 
-class GeneratorControllerPort(ABC):
+class ChatApplicationPort(ABC):
+
     @abstractmethod
-    def generate_message(self, prompt: str, chat_history: list[RoleMessageRequest]) -> str:
+    def get_generated_text(self, prompt: str, chat_history: History) -> str:
         pass
 
     @abstractmethod
