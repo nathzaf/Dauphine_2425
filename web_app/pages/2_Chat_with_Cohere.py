@@ -11,11 +11,11 @@ import requests
 
 from rest.model.chat_request import ChatRequest
 
-# Titles
+#Titles
 st.title("💬 Chatbot with Memory")
 st.caption("🚀 My First Chatbot using Cohere")
 
-# Sidebar with description
+#Sidebar with description
 with st.sidebar:
     st.markdown("""
                 This page demonstrates how to create a memory-enabled chatbot using Cohere, showcasing
@@ -32,20 +32,13 @@ st.markdown(
         """
         )
 
-# FastAPI created at 
+#FastAPI created at 
 api_url="https://dauphine-2425-gb-forked-1.onrender.com/chat"
 
+# Code copied from https://github.com/streamlit/llm-examples/blob/main/Chatbot.py
 # Initialize the chat history
-if "conversation_id" not in st.session_state:
-    st.session_state["conversation_id"] = "default"
-
 if "messages" not in st.session_state:
-    st.session_state["messages"] = []
-
-# Fetch the chat history from the API
-response = requests.get(f"{api_url}/history/{st.session_state['conversation_id']}")
-if response.status_code == 200:
-    st.session_state["messages"] = response.json()
+    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
 # Display the chat history
 for msg in st.session_state.messages:
@@ -54,6 +47,7 @@ for msg in st.session_state.messages:
 # When a user submits a message
 if prompt := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
+    ##st.chat_message("assistant").write("Hello Buddy")
 
     # Display the user's message
     st.chat_message("user").write(prompt)
@@ -71,3 +65,6 @@ if prompt := st.chat_input():
     # Display the bot's response
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     st.chat_message("assistant").write(bot_response)
+
+
+
