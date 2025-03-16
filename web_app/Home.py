@@ -27,7 +27,7 @@ Each group is expected to create a functional application using the technologies
 ## Project Structure
 1. **Phase 1: Design** - Define the problem you want to solve with your application and design a solution using the mentioned technologies.
 
-2. **Phase 2: Development** - Develop the application using Streamlit for the interface, Langchain and Cohere for NLP processing, WatsonX for AI functionalities, and FastAPI for the backend.
+2. **Phase 2: Development** - Develop the application using Streamlit for the interface, Cohere for NLP processing and FastAPI for the backend.
 
 3. **Phase 3: Deployment** - Deploy your application on a platform of your choice, ensuring it is accessible and functional.
 
