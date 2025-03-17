@@ -1,5 +1,4 @@
 import os
-from dataclasses import dataclass
 from dotenv import load_dotenv
 import cohere
 
@@ -13,12 +12,13 @@ from infrastructure.text_generator.cohere_text_generator import CohereTextGenera
 load_dotenv()
 COHERE_API_KEY = os.environ.get('COHERE_API_KEY')  # Récupère la clé API Cohere
 
-@dataclass
 class TextGeneratorAdapter(TextGeneratorPort):
-    """
-    Adaptateur pour connecter le port TextGeneratorPort à l'implémentation CohereTextGenerator.
-    """
-    cohere_text_generator: CohereTextGenerator = CohereTextGenerator()  # Instance du générateur Cohere
+    def __init__(self, cohere_text_generator: CohereTextGenerator):
+        """
+        Adaptateur pour connecter le port TextGeneratorPort à l'implémentation CohereTextGenerator.
+        :param cohere_text_generator: Instance de CohereTextGenerator.
+        """
+        self.cohere_text_generator = cohere_text_generator
 
     def get_generated_text(self, prompt: str) -> str:
         """

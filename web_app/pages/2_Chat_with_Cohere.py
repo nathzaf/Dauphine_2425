@@ -47,9 +47,9 @@ api_url="http://127.0.0.1:8000/chat"
 # Code copied from https://github.com/streamlit/llm-examples/blob/main/Chatbot.py
 # Initialize the chat history
 if "messages" not in st.session_state:
-    st.session_state["messages"] = chathistory
+    #st.session_state["messages"] = chathistory
     #Old first message
-    #st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you my friend?"}]
+    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you my friend?"}]
 
 # Display the chat history
 for msg in st.session_state.messages:
