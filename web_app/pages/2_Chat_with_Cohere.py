@@ -11,9 +11,18 @@ import requests
 
 from rest.model.chat_request import ChatRequest
 
+
+#Fake History for testing
+chathistory = [{"role": "assistant", "content": "How are you?"},
+               {"role": "user", "content": "I am fine, thank you."},
+               {"role": "assistant", "content": "How can I help you today?"}]
+
+
 #Titles
 st.title("💬 Chatbot with Memory")
 st.caption("🚀 My First Chatbot using Cohere")
+
+
 
 #Sidebar with description
 with st.sidebar:
@@ -38,7 +47,9 @@ api_url="http://127.0.0.1:8000/chat"
 # Code copied from https://github.com/streamlit/llm-examples/blob/main/Chatbot.py
 # Initialize the chat history
 if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+    st.session_state["messages"] = chathistory
+    #Old first message
+    #st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you my friend?"}]
 
 # Display the chat history
 for msg in st.session_state.messages:
@@ -47,13 +58,14 @@ for msg in st.session_state.messages:
 # When a user submits a message
 if prompt := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
-    ##st.chat_message("assistant").write("Hello Buddy")
 
     # Display the user's message
     st.chat_message("user").write(prompt)
 
     # Prepare the payload for the API request
     request = ChatRequest(prompt=prompt)
+    #messages is the chat history we would like to send to the API
+    print(st.session_state.messages)
     # Send the request to the API
     try:
         response = requests.post(api_url, json=request.to_dict())
