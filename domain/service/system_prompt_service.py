@@ -4,7 +4,7 @@ class SystemPromptService:
     def __init__(self):
         # Initialisez le prompt par défaut
         self.system_prompt = SystemPrompt(
-            content="You are an assistant, helping a user named GB, and you answer him using with jokes"
+            content="You are an assistant, helping a user answering his questions"
         )
 
     def get_system_prompt(self) -> str:
