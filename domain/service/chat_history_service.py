@@ -1,15 +1,19 @@
 from domain.model.chat_history import ChatHistory
 from domain.model.role_message import RoleMessage
+from domain.port.chat_history_port import ChatHistoryPeristencePort
 
 class ChatHistoryService:
-    def __init__(self):
-        self.chat_history = ChatHistory()
+    def __init__(self, history_handler: ChatHistoryPeristencePort):
+        self.history_handler = history_handler
+        
+    def get_all_conversations(self) -> list[str]:
+        return self.history_handler.get_all_conversations()
 
-    def add_message(self, role: str, message: str):
-        self.chat_history.messages.append(RoleMessage(role=role, message=message))
+    def get_history(self) -> ChatHistory:
+        return self.history_handler.get_history()
 
-    def get_history(self):
-        return self.chat_history.messages
+    def add_message(self, conversation_guid: str, role_message: RoleMessage) -> ChatHistory:
+        return self.history_handler.add_message_to_history(conversation_guid, role_message)
 
-    def clear_history(self):
-        self.chat_history.messages = []
+    def clear_history(self, conversation_guid: str) -> ChatHistory:
+        return self.history_handler.clear_history(conversation_guid)
