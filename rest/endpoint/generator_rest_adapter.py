@@ -5,7 +5,7 @@ from rest.model.chat_request import ChatRequest
 from rest.model.single_prompt_response import SinglePromptResponse
 from rest.model.conversation_reponse import ConversationResponse
 
-from domain.port.generator_controller_port import GeneratorControllerPort
+from domain.port.driving.generator_controller_port import GeneratorControllerPort
 
 # Adaptateur REST pour gérer les requêtes HTTP
 class GeneratorRestAdapter:

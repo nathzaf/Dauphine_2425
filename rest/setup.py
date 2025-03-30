@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-from domain.adapter.generator_controller_adapter import GeneratorControllerAdapter
+from domain.port.impl.generator_controller_adapter import GeneratorControllerAdapter
 from domain.service.text_generation_service import TextGenerationService
 from domain.service.system_prompt_service import SystemPromptService
 from domain.service.chat_history_service import ChatHistoryService

@@ -1,6 +1,6 @@
 from domain.model.chat_history import ChatHistory
 from domain.model.role_message import RoleMessage
-from domain.port.chat_history_persistence_port import ChatHistoryPersistencePort
+from domain.port.driven.chat_history_persistence_port import ChatHistoryPersistencePort
 
 class ChatHistoryService:
     def __init__(self, history_handler: ChatHistoryPersistencePort):

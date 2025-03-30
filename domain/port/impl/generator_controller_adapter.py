@@ -1,6 +1,6 @@
 from domain.model.chat_history import ChatHistory
 from domain.model.role_message import RoleMessage
-from domain.port.generator_controller_port import GeneratorControllerPort
+from domain.port.driving.generator_controller_port import GeneratorControllerPort
 
 from domain.service.chat_history_service import ChatHistoryService
 from domain.service.text_generation_service import TextGenerationService

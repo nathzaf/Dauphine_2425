@@ -1,4 +1,4 @@
-from domain.port.text_generator_port import TextGeneratorPort
+from domain.port.driven.text_generator_port import TextGeneratorPort
 
 class TextGenerationService:
     def __init__(self, text_generator: TextGeneratorPort):

@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 
 from domain.model.chat_history import ChatHistory
 from domain.model.role_message import RoleMessage
-from domain.port.text_generator_port import TextGeneratorPort
-from domain.port.chat_history_persistence_port import ChatHistoryPersistencePort
+from domain.port.driven.text_generator_port import TextGeneratorPort
+from domain.port.driven.chat_history_persistence_port import ChatHistoryPersistencePort
 
 from infrastructure.history.json_history_repository import JsonHistoryRepository
 from infrastructure.text_generator.cohere_text_generator_v2 import CohereTextGenerator
