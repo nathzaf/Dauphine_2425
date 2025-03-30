@@ -21,7 +21,7 @@ class GeneratorRestAdapter:
         """
         try:
             response = self.controller.generate_message(request.prompt)
-            return SinglePromptResponse(response)
+            return SinglePromptResponse(response=response)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
