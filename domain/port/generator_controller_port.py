@@ -12,7 +12,15 @@ class GeneratorControllerPort(ABC):
         pass
     
     @abstractmethod
+    def create_conversation(self) -> str:
+        pass
+    
+    @abstractmethod
     def get_history(self, conversation_guid: str) -> ChatHistory:
+        pass
+    
+    @abstractmethod
+    def generate_message_in_conversation(self, conversation_guid: str, prompt: str) -> ChatHistory:
         pass
     
     @abstractmethod
