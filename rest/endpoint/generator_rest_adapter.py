@@ -59,7 +59,7 @@ class GeneratorRestAdapter:
         """
         try:
             updated_conversation = self.controller.generate_message_in_conversation(conversation_guid, request.prompt)
-            return ConversationResponse(guid=conversation_guid, history=updated_conversation)
+            return ConversationResponse(guid=conversation_guid, history=updated_conversation.messages)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
