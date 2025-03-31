@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 
 from rest.model.chat_request import ChatRequest
-from rest.model.single_prompt_response import SinglePromptResponse
 from rest.model.conversation_reponse import ConversationResponse
 
 from domain.port.driving.generator_controller_port import GeneratorControllerPort
@@ -10,20 +9,7 @@ from domain.port.driving.generator_controller_port import GeneratorControllerPor
 # Adaptateur REST pour gérer les requêtes HTTP
 class GeneratorRestAdapter:
     def __init__(self, controller: GeneratorControllerPort):
-        """
-        Initialise l'adaptateur avec un contrôleur.
-        """
         self.controller = controller
-
-    async def chat(self, request: ChatRequest) -> SinglePromptResponse:
-        """
-        Gère les requêtes POST à /chat et génère une réponse.
-        """
-        try:
-            response = self.controller.generate_message(request.prompt)
-            return SinglePromptResponse(response=response)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
         
     async def get_all_conversations(self) -> JSONResponse:
         """
@@ -85,11 +71,7 @@ class GeneratorRestAdapter:
             raise HTTPException(status_code=500, detail=str(e))
     
     def get_router(self) -> APIRouter:
-        """
-        Configure et retourne un routeur FastAPI.
-        """
         router = APIRouter()
-        router.post("/chat")(self.chat)
         router.get("/conversation")(self.get_all_conversations)
         router.post("/conversation")(self.create_conversation)
         router.get("/conversation/{conversation_guid}")(self.get_conversation)
