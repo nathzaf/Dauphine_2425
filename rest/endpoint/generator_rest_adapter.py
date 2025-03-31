@@ -59,7 +59,7 @@ class GeneratorRestAdapter:
         if conversation is None:
             raise HTTPException(status_code=404, detail="Conversation not found")
         
-        return ConversationResponse(guid=conversation_guid, history=conversation)
+        return ConversationResponse(guid=conversation_guid, history=conversation.messages)
 
     async def generate_message_for_conversation(self, conversation_guid: str, request: ChatRequest) -> ConversationResponse:
         """
