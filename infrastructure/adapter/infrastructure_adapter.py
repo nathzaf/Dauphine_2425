@@ -7,7 +7,7 @@ from domain.port.driven.text_generator_port import TextGeneratorPort
 from domain.port.driven.chat_history_persistence_port import ChatHistoryPersistencePort
 
 from infrastructure.history.json_history_repository import JsonHistoryRepository
-from infrastructure.text_generator.cohere_text_generator_v2 import CohereTextGenerator
+from infrastructure.text_generator.cohere_text_generator import CohereTextGenerator
 
 # Charger les variables d'environnement depuis un fichier .env
 load_dotenv()
@@ -20,8 +20,8 @@ class InfrastructureAdapter(TextGeneratorPort, ChatHistoryPersistencePort):
         self.cohere_text_generator = cohere_text_generator
         self.json_history_repository = json_history_repository
 
-    def get_generated_text(self, prompt: str) -> str:
-        return self.cohere_text_generator.generate_text(prompt=prompt)
+    def get_generated_text(self, chat_history: ChatHistory) -> str:
+        return self.cohere_text_generator.generate_text(chat_history)
 
     def get_all_conversations(self) -> list[str]:
         return self.json_history_repository.get_all_conversations()

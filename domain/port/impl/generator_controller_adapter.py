@@ -9,8 +9,7 @@ class GeneratorControllerAdapter(GeneratorControllerPort):
     def __init__(
         self,
         text_generation_service: TextGenerationService = None,
-        chat_history_service: ChatHistoryService = None,
-    ):
+        chat_history_service: ChatHistoryService = None):
         self.text_generation_service = text_generation_service
         self.chat_history_service = chat_history_service
 
@@ -27,8 +26,8 @@ class GeneratorControllerAdapter(GeneratorControllerPort):
         return self.chat_history_service.get_history(conversation_guid)
 
     def generate_message_in_conversation(self, conversation_guid: str, prompt: str) -> ChatHistory:
-        self.add_user_prompt_to_history(conversation_guid, prompt)
-        generated_text = self.text_generation_service.get_generated_text(prompt)
+        history_with_prompt = self.add_user_prompt_to_history(conversation_guid, prompt)
+        generated_text = self.text_generation_service.get_generated_text(history_with_prompt)
         return self.add_generated_message_to_history(conversation_guid, generated_text)
 
     def add_user_prompt_to_history(self, conversation_guid: str, prompt: str) -> ChatHistory:
