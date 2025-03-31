@@ -25,21 +25,29 @@ class GeneratorRestAdapter:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
-    async def get_all_conversations(self) -> list[str]:
+    async def get_all_conversations(self) -> JSONResponse:
         """
         Récupère toutes les conversations disponibles.
         """
         try:
-            return self.controller.get_conversations()
+            conversations = self.controller.get_conversations()
+            return JSONResponse(
+                content={"conversation_ids": conversations},
+                status_code=200
+            )
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to retrieve conversations: {str(e)}")
     
-    async def create_conversation(self) -> str:
+    async def create_conversation(self) -> JSONResponse:
         """
         Crée une nouvelle conversation et retourne son identifiant.
         """
         try:
-            return self.controller.create_conversation()
+            conversation_id = self.controller.create_conversation()
+            return JSONResponse(
+                content={"conversation_id": conversation_id},
+                status_code=201
+            )
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to create a new conversation: {str(e)}")
     
