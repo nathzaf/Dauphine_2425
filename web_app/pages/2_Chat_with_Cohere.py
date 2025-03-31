@@ -1,72 +1,113 @@
 import sys
 from dotenv import load_dotenv
 import os
-
-load_dotenv()
-
-sys.path.append(os.getenv('PYTHONPATH'))
-
 import streamlit as st
 import requests
-
 from rest.model.chat_request import ChatRequest
 
+# Charger les variables d'environnement
+load_dotenv()
+BASE_API_URL = "http://127.0.0.1:8000"
+sys.path.append(os.getenv('PYTHONPATH'))
 
+# Fonction pour gérer les appels API
+def api_request(method, url, data=None):
+    try:
+        if method == "GET":
+            response = requests.get(url)
+        elif method == "POST":
+            response = requests.post(url, json=data)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erreur lors de l'appel API : {e}")
+        return None
 
-#Titles
+# Fonction pour créer une nouvelle conversation
+def create_new_conversation():
+    url = f"{BASE_API_URL}/conversation"
+    response = api_request("POST", url)
+    return response.get("conversation_id") if response else None
+
+# Fonction pour créer une conversation par défaut
+def create_default_conversation():
+    new_conv_id = create_new_conversation()
+    if new_conv_id:
+        st.session_state["conv_id"] = new_conv_id
+        st.session_state["messages"] = [{"role": "assistant", "message": "How can I help you?"}]
+    else:
+        st.error("Impossible de créer une nouvelle conversation par défaut.")
+
+# Fonction pour récupérer l'historique de la conversation
+def get_conversation_history(conv_id):
+    url = f"{BASE_API_URL}/conversation/{conv_id}"
+    response = api_request("GET", url)
+    if response and "history" in response:
+        return response["history"]
+    st.error("La réponse de l'API n'est pas dans le format attendu.")
+    return []
+
+# Fonction pour gérer l'entrée utilisateur
+def handle_user_input(prompt):
+    st.session_state.messages.append({"role": "user", "message": prompt})
+    st.chat_message("user").write(prompt)
+
+    url = f"{BASE_API_URL}/conversation/{st.session_state['conv_id']}"
+    request = ChatRequest(prompt=prompt)
+    response = api_request("POST", url, data=request.to_dict())
+
+    if response and "history" in response:
+        history = response["history"]
+        bot_response = next(
+            (msg["message"] for msg in reversed(history) if msg["role"] == "assistant"),
+            "I didn't understand that."
+        )
+    else:
+        bot_response = "I didn't understand that."
+
+    st.session_state.messages.append({"role": "assistant", "message": bot_response})
+    st.chat_message("assistant").write(bot_response)
+
+# Initialisation de la session
+if "conv_id" not in st.session_state:
+    create_default_conversation()
+
+# Titre et description de l'application
 st.title("💬 Chatbot")
 st.caption("🚀 My First Chatbot using Cohere")
 
-
-
-#Sidebar with description
+# Barre latérale avec description
 with st.sidebar:
     st.markdown("""
-                This page demonstrates how to create a memory-enabled chatbot using Cohere, showcasing
-                the integration of advanced NLP capabilities in a user-friendly interface. Explore the 
-                examples and learn how to build your own intelligent applications.     
-                """)
+        This page demonstrates how to create a memory-enabled chatbot using Cohere, showcasing
+        the integration of advanced NLP capabilities in a user-friendly interface. Explore the 
+        examples and learn how to build your own intelligent applications.     
+    """)
     st.header("📚 Learn More")
     st.markdown("""Explore the examples and learn how to build your own intelligent applications.
-                [Cohere API](https://docs.cohere.com/reference/chat)""")
-            
-st.markdown(
-        """
-        On this demonstration we will be able to send request to Cohere and have a chat with history 
-        """
-        )
+        [Cohere API](https://docs.cohere.com/reference/chat)""")
+    st.markdown("---")
+    if st.button("New Conversation"):
+        new_conv_id = create_new_conversation()
+        if new_conv_id:
+            st.session_state["conv_id"] = new_conv_id
+            st.session_state["messages"] = [{"role": "assistant", "message": "Welcome! How can I assist you today?"}]
 
-#FastAPI created at 
-api_url="http://127.0.0.1:8000/chat"
+st.markdown("""
+    On this demonstration we will be able to send request to Cohere and have a chat with history.
+""")
 
-# Initialize the chat history
-if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you my friend?"}]
+# Initialiser et afficher l'historique de la conversation
+history = get_conversation_history(st.session_state["conv_id"])
+st.session_state["messages"] = history if history else []
 
-# Display the chat history
-for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+# Afficher les messages existants
+for msg in st.session_state["messages"]:
+    st.chat_message(msg["role"]).write(msg["message"])
 
-# When a user submits a message
+# Gestion de l'entrée utilisateur
 if prompt := st.chat_input():
-    st.session_state.messages.append({"role": "user", "content": prompt})
-
-    # Display the user's message
-    st.chat_message("user").write(prompt)
-
-    # Prepare the payload for the API request
-    request = ChatRequest(prompt=prompt)
-    # Send the request to the API
-    try:
-        response = requests.post(api_url, json=request.to_dict())
-        response.raise_for_status() # Will raise an exception for HTTP errors
-        bot_response = response.json().get("response", "I didn't understand that.")
-    except requests.exceptions.RequestException as e:
-        bot_response = f"Error: {e}"
-    
-    # Display the bot's response
-    st.session_state.messages.append({"role": "assistant", "content": bot_response})
-    st.chat_message("assistant").write(bot_response)
+    handle_user_input(prompt)
 
 
 
