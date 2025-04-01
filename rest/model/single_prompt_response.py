@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field
 from fastapi.encoders import jsonable_encoder
 
-class ChatResponse(BaseModel):
-    response: str = Field(title="Response", 
+class SinglePromptResponse(BaseModel):
+    response: str = Field(default=None,
+                        title="Response", 
                         description="The generated response")
 
     def to_dict(self) -> dict:
