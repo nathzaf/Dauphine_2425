@@ -1,6 +1,8 @@
 import os
 import sys
 import uuid
+import json
+import requests
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -10,8 +12,6 @@ load_dotenv()
 sys.path.append(os.getenv('PYTHONPATH'))
 
 import streamlit as st
-import requests
-import json
 
 # Page configuration
 st.set_page_config(
@@ -97,11 +97,15 @@ if "documents_retrieved" not in st.session_state:
 if "process_status" not in st.session_state:
     st.session_state["process_status"] = 0
 if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "Bonjour ! Comment puis-je vous aider avec vos démarches aujourd'hui ?"}]
+    st.session_state.messages = []
 if "chat_id" not in st.session_state:
-    st.session_state["chat_id"] = str(uuid.uuid4())
+    st.session_state.chat_id = str(uuid.uuid4())
 if "active_tab" not in st.session_state:
     st.session_state["active_tab"] = 0
+if "history_loaded" not in st.session_state:
+    st.session_state.history_loaded = False
+if "show_histories" not in st.session_state:
+    st.session_state.show_histories = False
 
 # Get query parameters to determine which section to show
 section = st.query_params.get("section", None)
@@ -213,36 +217,241 @@ if st.session_state["active_tab"] == 1:
     """
     st.markdown(tab_script, unsafe_allow_html=True)
 
+# Backend API configuration
+API_BASE_URL = "http://127.0.0.1:8000"
+
+def call_chat_api(prompt: str, chat_history: list) -> str:
+    """Call the backend chat API"""
+    try:
+        # Convert chat history to the format expected by the backend
+        formatted_history = []
+        for msg in chat_history:
+            formatted_history.append({
+                "role": msg["role"].upper() if msg["role"] == "user" else "CHATBOT",
+                "message": msg["content"]
+            })
+        
+        # Prepare the request payload
+        payload = {
+            "prompt": prompt,
+            "chat_history": formatted_history
+        }
+        
+        # Make the API call
+        response = requests.post(f"{API_BASE_URL}/chat", json=payload, timeout=30)
+        
+        if response.status_code == 200:
+            return response.json()["response"]
+        else:
+            st.error(f"Erreur API: {response.status_code}")
+            return "Désolé, je rencontre des difficultés techniques. Veuillez réessayer."
+            
+    except requests.exceptions.ConnectionError:
+        st.error("Impossible de se connecter au service de chat. Assurez-vous que le backend est démarré.")
+        return "Service de chat temporairement indisponible."
+    except requests.exceptions.Timeout:
+        st.error("Le service de chat met trop de temps à répondre.")
+        return "Le service met trop de temps à répondre. Veuillez réessayer."
+    except Exception as e:
+        st.error(f"Erreur inattendue: {str(e)}")
+        return "Une erreur inattendue s'est produite."
+
+def save_chat_history():
+    """Save chat history to backend"""
+    try:
+        if not st.session_state.messages:
+            return
+            
+        # Convert messages to backend format
+        formatted_history = []
+        for msg in st.session_state.messages:
+            formatted_history.append({
+                "role": msg["role"].upper() if msg["role"] == "user" else "CHATBOT",
+                "message": msg["content"]
+            })
+        
+        payload = {
+            "chat_id": st.session_state.chat_id,
+            "chat_history": formatted_history
+        }
+        
+        response = requests.post(f"{API_BASE_URL}/histories", json=payload, timeout=10)
+        
+        if response.status_code == 201:
+            print(f"Chat history saved successfully for chat_id: {st.session_state.chat_id}")
+        else:
+            print(f"Failed to save chat history: {response.status_code}")
+            
+    except Exception as e:
+        print(f"Error saving chat history: {str(e)}")
+
+def load_chat_history(chat_id: str = None):
+    """Load chat history from backend"""
+    try:
+        target_chat_id = chat_id or st.session_state.chat_id
+        response = requests.get(f"{API_BASE_URL}/histories/{target_chat_id}", timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            # Convert backend format to frontend format
+            messages = []
+            for msg in data["chat_history"]:
+                role = "user" if msg["role"] == "USER" else "assistant"
+                messages.append({"role": role, "content": msg["message"]})
+            
+            st.session_state.messages = messages
+            st.session_state.chat_id = target_chat_id
+            return True
+        elif response.status_code == 404:
+            # Chat history doesn't exist yet, start fresh
+            st.session_state.messages = []
+            return True
+        else:
+            print(f"Error loading chat history: {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print(f"Error loading chat history: {str(e)}")
+        return False
+
+def get_all_chat_histories():
+    """Get all available chat histories"""
+    try:
+        response = requests.get(f"{API_BASE_URL}/histories", timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return data.get("histories", [])
+        else:
+            print(f"Error getting all histories: {response.status_code}")
+            return []
+            
+    except Exception as e:
+        print(f"Error getting all histories: {str(e)}")
+        return []
+
+def check_backend_status():
+    """Check if backend is running"""
+    try:
+        response = requests.get(f"{API_BASE_URL}/", timeout=5)
+        return response.status_code == 200
+    except:
+        return False
+
+def display_chat_management():
+    """Display chat history management"""
+    st.subheader("Gestion des conversations")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("🆕 Nouvelle conversation", use_container_width=True):
+            st.session_state.chat_id = str(uuid.uuid4())
+            st.session_state.messages = []
+            st.session_state.history_loaded = False
+            st.success("Nouvelle conversation créée!")
+            st.rerun()
+    
+    with col2:
+        if st.button("📋 Voir historiques", use_container_width=True):
+            histories = get_all_chat_histories()
+            if histories:
+                st.session_state.show_histories = True
+            else:
+                st.info("Aucun historique disponible")
+    
+    # Show available histories if requested
+    if st.session_state.get("show_histories", False):
+        st.write("**Conversations disponibles:**")
+        histories = get_all_chat_histories()
+        
+        if histories:
+            for i, history in enumerate(histories, 1):
+                chat_id = history["chat_id"]
+                
+                # Create a meaningful preview from the conversation
+                preview = "Conversation vide"
+                if history["chat_history"]:
+                    # Get the first user message as preview
+                    first_user_msg = None
+                    for msg in history["chat_history"]:
+                        if msg["role"] == "USER":
+                            first_user_msg = msg["message"]
+                            break
+                    
+                    if first_user_msg:
+                        preview = first_user_msg[:70] + "..." if len(first_user_msg) > 70 else first_user_msg
+                    else:
+                        # If no user message, use first message
+                        first_msg = history["chat_history"][0]["message"]
+                        preview = first_msg[:70] + "..." if len(first_msg) > 70 else first_msg
+                
+                # Display conversation with number and preview
+                col_preview, col_load = st.columns([4, 1])
+                with col_preview:
+                    st.write(f"**Conversation {i}:** {preview}")
+                with col_load:
+                    if st.button("Charger", key=f"load_{i}"):
+                        if load_chat_history(chat_id):
+                            st.session_state.history_loaded = True
+                            st.session_state.show_histories = False
+                            st.success(f"Conversation {i} chargée!")
+                            st.rerun()
+                        else:
+                            st.error("Erreur lors du chargement")
+        
+        if st.button("Fermer"):
+            st.session_state.show_histories = False
+            st.rerun()
+
 # Tab 1: Chatbot
 with tab1:
     st.header("Échanger avec l'assistant CAF")
     
-    # Display chat messages
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
+    # Backend status indicator
+    backend_connected = check_backend_status()
     
-    # Chat input
-    if prompt := st.chat_input("Posez votre question..."):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.chat_message("user").write(prompt)
+    if backend_connected:
+        st.success("🟢 Service de chat connecté")
         
-        # Simulate bot response
-        if "document" in prompt.lower() or "attestation" in prompt.lower() or "justificatif" in prompt.lower():
-            if st.session_state["documents_retrieved"]:
-                bot_response = "Vos documents ont été récupérés et sont en cours de vérification. Vous pouvez les consulter dans l'onglet 'Mes Documents'."
-            else:
-                bot_response = "Veuillez d'abord compléter vos informations pour que nous puissions récupérer vos documents."
-        elif "statut" in prompt.lower() or "état" in prompt.lower() or "avancement" in prompt.lower():
-            bot_response = f"L'état actuel de votre dossier est : {current_status}"
-        elif "allocation" in prompt.lower() or "aide" in prompt.lower() or "prestation" in prompt.lower():
-            bot_response = "Pour connaître vos droits aux prestations, rendez-vous sur la page d'accueil où vous trouverez toutes les aides auxquelles vous êtes éligible en fonction de votre situation."
-        else:
-            bot_response = "Je suis là pour vous aider avec vos démarches CAF. Vous pouvez me poser des questions sur vos documents, vos prestations ou l'état de votre dossier."
+        # Chat management section in sidebar or collapsible
+        with st.expander("🔧 Gestion des conversations", expanded=False):
+            display_chat_management()
         
-        # Add bot response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": bot_response})
-        st.chat_message("assistant").write(bot_response)
+        # Load chat history on first load
+        if not st.session_state.history_loaded:
+            load_chat_history()
+            st.session_state.history_loaded = True
+        
+        # Create a container for the chat interface
+        chat_container = st.container()
+        
+        # Display existing chat messages
+        with chat_container:
+            for msg in st.session_state.messages:
+                st.chat_message(msg["role"]).write(msg["content"])
+        
+        # Handle new user input - this must be at the root level, not in a container
+        if prompt := st.chat_input("Posez votre question..."):
+            # Add user message to session state first
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            
+            # Get bot response
+            with st.spinner("L'assistant réfléchit..."):
+                bot_response = call_chat_api(prompt, st.session_state.messages[:-1])
+            
+            # Add bot response to session state
+            st.session_state.messages.append({"role": "assistant", "content": bot_response})
+            
+            # Auto-save chat history to backend
+            save_chat_history()
+            
+            # Rerun to display the new messages
+            st.rerun()
+    else:
+        st.error("🔴 Service de chat déconnecté - Veuillez démarrer le backend")
+        st.info("Pour démarrer le backend, exécutez: `python main.py`")
+        st.warning("Le chat ne sera pas disponible tant que le backend n'est pas démarré.")
 
 # Tab 2: Documents
 with tab2:
