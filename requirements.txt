@@ -7,3 +7,8 @@ streamlit
 ##For Cohere part we will need that
 cohere
 fastAPI
+
+##For RAG functionality
+sentence-transformers
+numpy
+scikit-learn

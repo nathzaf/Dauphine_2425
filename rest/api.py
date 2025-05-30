@@ -1,11 +1,13 @@
 from fastapi import FastAPI
-
-from rest.setup import create_generator_rest_adapter
+from infrastructure.config.dependency_injection import container
 from rest.endpoint.root import router as root_router
 
 rest_api = FastAPI()
 
 rest_api.include_router(root_router)
 
-generator_rest_adapter = create_generator_rest_adapter()
-rest_api.include_router(generator_rest_adapter.get_router())
+# Chat endpoints
+rest_api.include_router(container.chat_controller.get_router())
+
+# Document endpoints
+rest_api.include_router(container.document_controller.get_router())

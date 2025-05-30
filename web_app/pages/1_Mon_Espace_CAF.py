@@ -102,6 +102,8 @@ if "chat_id" not in st.session_state:
     st.session_state["chat_id"] = str(uuid.uuid4())
 if "active_tab" not in st.session_state:
     st.session_state["active_tab"] = 0
+if "chat_history_loaded" not in st.session_state:
+    st.session_state["chat_history_loaded"] = False
 
 # Get query parameters to determine which section to show
 section = st.query_params.get("section", None)
@@ -113,6 +115,42 @@ st.markdown("""
     <div>Mon Espace</div>
 </div>
 """, unsafe_allow_html=True)
+
+def load_chat_history(chat_id):
+    """Load chat history from backend"""
+    try:
+        response = requests.get(f"http://127.0.0.1:8000/histories/{chat_id}", timeout=10)
+        if response.status_code == 200:
+            history_data = response.json()["chat_history"]
+            messages = []
+            for msg in history_data:
+                role = "user" if msg["role"] == "USER" else "assistant"
+                messages.append({"role": role, "content": msg["message"]})
+            return messages
+    except requests.exceptions.RequestException:
+        pass
+    return []
+
+def load_user_documents(user_info):
+    """Load and ingest user-specific documents"""
+    try:
+        # Trigger document ingestion for the user
+        response = requests.post(
+            "http://127.0.0.1:8000/documents/ingest",
+            json={
+                "user_id": st.session_state["chat_id"],
+                "user_info": user_info
+            },
+            timeout=30
+        )
+        if response.status_code == 200:
+            return True
+        else:
+            st.error(f"Erreur lors de l'ingestion: {response.status_code}")
+            return False
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erreur de connexion: {e}")
+        return False 
 
 # Main title
 st.title("Mon Espace Personnel")
@@ -160,8 +198,17 @@ with st.sidebar:
                     "submission_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
                 st.session_state["documents_retrieved"] = True
-                st.session_state["process_status"] = 33  # Set initial progress
-                st.success("Informations enregistrées avec succès !")
+                st.session_state["process_status"] = 33
+                
+                # Automatically ingest user documents
+                with st.spinner("Récupération de vos documents personnalisés..."):
+                    success = load_user_documents(st.session_state["user_info"])
+                    if success:
+                        st.success("Informations et documents enregistrés avec succès !")
+                        st.session_state["documents_ingested"] = True
+                    else:
+                        st.warning("Informations enregistrées mais erreur lors de la récupération des documents.")
+                        st.session_state["documents_ingested"] = False
                 
                 # If coming from profile section, switch to documents tab
                 if section == "profile":
@@ -174,6 +221,63 @@ with st.sidebar:
     # Close highlight div if needed
     if section == "profile":
         st.markdown('</div>', unsafe_allow_html=True)
+
+    st.subheader("Historique des conversations")
+    
+    # Button to start new conversation
+    if st.button("Nouvelle conversation"):
+        st.session_state["chat_id"] = str(uuid.uuid4())
+        st.session_state["messages"] = [{"role": "assistant", "content": "Bonjour ! Comment puis-je vous aider avec vos démarches aujourd'hui ?"}]
+        st.session_state["chat_history_loaded"] = False
+        st.rerun()
+    
+    # Load and display all conversations
+    try:
+        response = requests.get("http://127.0.0.1:8000/histories", timeout=10)
+        if response.status_code == 200:
+            all_histories = response.json()["histories"]
+            
+            for i, history in enumerate(all_histories[:5]):  # Show last 5 conversations
+                chat_id = history["chat_id"]
+                first_message = history["chat_history"][0]["message"] if history["chat_history"] else "Conversation vide"
+                
+                if st.button(f"Conv. {i+1}: {first_message[:30]}...", key=f"load_chat_{chat_id}"):
+                    st.session_state["chat_id"] = chat_id
+                    st.session_state["chat_history_loaded"] = False
+                    st.rerun()
+    except requests.exceptions.RequestException:
+        st.sidebar.error("Impossible de charger l'historique")
+
+    if st.session_state.get("user_info"):
+        st.divider()
+        st.subheader("📚 Gestion des documents")
+        
+        # Show document ingestion status
+        if st.button("Actualiser mes documents"):
+            with st.spinner("Récupération de vos documents..."):
+                success = load_user_documents(st.session_state["user_info"])
+                if success:
+                    st.success("Documents mis à jour!")
+                else:
+                    st.error("Erreur lors de la récupération")
+        
+        # Document search
+        search_query = st.text_input("Rechercher dans mes documents")
+        if search_query:
+            try:
+                response = requests.post(
+                    "http://127.0.0.1:8000/documents/search",
+                    json={"query": search_query, "limit": 3},
+                    timeout=10
+                )
+                if response.status_code == 200:
+                    results = response.json()["results"]
+                    st.write(f"**Résultats trouvés: {len(results)}**")
+                    for result in results:
+                        with st.expander(f"📄 {result['metadata'].get('original_title', 'Document')}"):
+                            st.write(result["content"][:200] + "...")
+            except requests.exceptions.RequestException:
+                st.error("Erreur de recherche")
 
 # Status bar showing process advancement
 st.subheader("État de votre dossier")
@@ -217,6 +321,12 @@ if st.session_state["active_tab"] == 1:
 with tab1:
     st.header("Échanger avec l'assistant CAF")
     
+    # RAG status indicator
+    if st.session_state.get("user_info"):
+        st.info("🧠 Assistant intelligent activé - J'ai accès à vos documents personnalisés")
+    else:
+        st.warning("ℹ️ Assistant en mode général - Complétez votre profil pour un assistant personnalisé")
+    
     # Display chat messages
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
@@ -227,22 +337,67 @@ with tab1:
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.chat_message("user").write(prompt)
         
-        # Simulate bot response
-        if "document" in prompt.lower() or "attestation" in prompt.lower() or "justificatif" in prompt.lower():
-            if st.session_state["documents_retrieved"]:
-                bot_response = "Vos documents ont été récupérés et sont en cours de vérification. Vous pouvez les consulter dans l'onglet 'Mes Documents'."
+        # Prepare chat history for backend API
+        chat_history = []
+        for msg in st.session_state.messages[:-1]:  # Exclude the last user message
+            role = "USER" if msg["role"] == "user" else "CHATBOT"
+            chat_history.append({
+                "role": role,
+                "message": msg["content"]
+            })
+        
+        try:
+            # Call the enhanced RAG chat API
+            with st.spinner("L'assistant analyse vos documents et prépare sa réponse..."):
+                payload = {
+                    "prompt": prompt,
+                    "chat_history": chat_history
+                }
+                
+                # Add user context if available
+                if st.session_state.get("user_info"):
+                    payload["user_id"] = st.session_state["chat_id"]
+                    payload["user_context"] = st.session_state["user_info"]
+                
+                response = requests.post(
+                    "http://127.0.0.1:8000/chat",
+                    json=payload,
+                    timeout=30
+                )
+            
+            if response.status_code == 200:
+                bot_response = response.json()["response"]
             else:
-                bot_response = "Veuillez d'abord compléter vos informations pour que nous puissions récupérer vos documents."
-        elif "statut" in prompt.lower() or "état" in prompt.lower() or "avancement" in prompt.lower():
-            bot_response = f"L'état actuel de votre dossier est : {current_status}"
-        elif "allocation" in prompt.lower() or "aide" in prompt.lower() or "prestation" in prompt.lower():
-            bot_response = "Pour connaître vos droits aux prestations, rendez-vous sur la page d'accueil où vous trouverez toutes les aides auxquelles vous êtes éligible en fonction de votre situation."
-        else:
-            bot_response = "Je suis là pour vous aider avec vos démarches CAF. Vous pouvez me poser des questions sur vos documents, vos prestations ou l'état de votre dossier."
+                bot_response = "Désolé, j'ai rencontré un problème technique. Veuillez réessayer."
+                
+        except requests.exceptions.RequestException as e:
+            st.error(f"Erreur de connexion avec l'assistant: {e}")
+            bot_response = "Désolé, je ne peux pas vous répondre en ce moment. Veuillez vérifier que le serveur backend est démarré."
         
         # Add bot response to chat history
         st.session_state.messages.append({"role": "assistant", "content": bot_response})
         st.chat_message("assistant").write(bot_response)
+        
+        # Save conversation history
+        try:
+            complete_history = []
+            for msg in st.session_state.messages:
+                role = "USER" if msg["role"] == "user" else "CHATBOT"
+                complete_history.append({
+                    "role": role,
+                    "message": msg["content"]
+                })
+            
+            requests.post(
+                "http://127.0.0.1:8000/histories",
+                json={
+                    "chat_id": st.session_state["chat_id"],
+                    "chat_history": complete_history
+                },
+                timeout=10
+            )
+        except requests.exceptions.RequestException:
+            pass
 
 # Tab 2: Documents
 with tab2:
@@ -359,4 +514,12 @@ if st.session_state["process_status"] >= 33 and st.session_state["process_status
         st.session_state["process_status"] = 100
         st.balloons()
         st.success("Tous vos documents ont été vérifiés avec succès !")
-        st.rerun() 
+        st.rerun()
+
+# Load existing history when page loads
+if not st.session_state["chat_history_loaded"]:
+    loaded_messages = load_chat_history(st.session_state["chat_id"])
+    if loaded_messages:
+        st.session_state.messages = loaded_messages
+    st.session_state["chat_history_loaded"] = True
+
