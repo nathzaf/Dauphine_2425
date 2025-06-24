@@ -7,3 +7,10 @@ streamlit
 ##For Cohere part we will need that
 cohere
 fastAPI
+
+langchain
+langchain-community
+PyMuPDF
+pytesseract
+Pillow
+numpy
