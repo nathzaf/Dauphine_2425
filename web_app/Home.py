@@ -272,7 +272,7 @@ else:
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric(label="Documents vérifiés", value=f"{st.session_state['process_status']}%", delta="Complété" if st.session_state["process_status"] == 100 else "En cours")
+        st.metric(label="Avancement du dossier", value=f"{st.session_state['process_status']}%", delta="Complété" if st.session_state["process_status"] == 100 else "En cours")
     
     with col2:
         eligible_activities = 0

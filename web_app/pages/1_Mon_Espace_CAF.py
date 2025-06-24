@@ -469,6 +469,26 @@ with tab2:
         st.write(f"**Date de mise à jour:** {user_info['submission_time']}")
         
         st.divider()
+
+        with st.expander("📊 Simulation de droits"):
+            st.write("**Statut:** Disponible ✅")
+            st.write("**Description:** Simulez vos droits aux prestations CAF")
+
+            # Simple simulation form
+            st.selectbox("Situation familiale", ["Célibataire", "En couple", "Famille monoparentale", "Colocation"])
+            st.number_input("Nombre d'enfants à charge", min_value=0, max_value=10)
+            st.number_input("Revenu mensuel du foyer (€)", min_value=0.0, step=100.0)
+            st.number_input("Loyer mensuel (€)", min_value=0.0, step=50.0)
+
+            # Button to run simulation
+            if st.button("Lancer la simulation"):
+                st.success("D'après nos estimations, vous pourriez bénéficier des aides suivantes :")
+                st.metric("Aide personnalisée au logement (APL)", "320,45 €/mois")
+                st.metric("Prime d'activité", "175,30 €/mois")
+
+        # Close highlight div if needed
+        if section == "simulation":
+            st.markdown('</div>', unsafe_allow_html=True)
         
         # Display mock documents
         st.subheader("Documents officiels")
@@ -479,60 +499,30 @@ with tab2:
         
         # Create expandable sections for each document
         with st.expander("🆔 Attestation de droits", expanded=True):
-            st.write("**Statut:** Disponible ✅")
-            st.write("**Émis par:** CAF")
-            st.write("**Date d'émission:** 15/05/2023")
-            st.write("**Date de validité:** 14/05/2024")
-            
-            # Simulate document content
-            st.code(json.dumps({
-                "type_document": "Attestation de droits",
-                "nom_allocataire": f"{user_info['last_name']} {user_info['first_name']}",
-                "numero_allocataire": user_info['id_number'],
-                "date_naissance": user_info['birth_date'],
-                "prestations": ["Allocations Familiales", "Aide au Logement"],
-                "montant_total": "453,21€",
-                "date_emission": datetime.now().strftime("%Y-%m-%d")
-            }, indent=2), language="json")
-            
-            # Button to download document
-            st.download_button(
-                label="Télécharger l'attestation",
-                data="Ceci est une attestation de droits CAF",
-                file_name="attestation_droits_caf.pdf",
-                mime="application/pdf"
-            )
-        
-        with st.expander("🏠 Attestation de logement"):
             st.write("**Statut:** En attente de vérification ⏳")
             st.write("**Émis par:** CAF")
+
+        
+        with st.expander("🏠 Attestation de logement"):
+            st.write("**Statut:** Vérfié ✅")
+            st.write("**Émis par:** EDF")
             
             # Simulate address verification process
-            if st.button("Demander une attestation de logement"):
+            if st.button("Télécharger mon attestation de logement"):
                 st.session_state["process_status"] = 66
                 st.success("Demande d'attestation de logement envoyée. Notre service va traiter votre demande.")
                 st.rerun()
-        
+
         with st.expander("💼 Déclaration trimestrielle de ressources"):
-            st.write("**Statut:** À compléter ❗")
-            st.write("**Période concernée:** Trimestre 2 - 2023")
-            st.write("**Date limite:** 30/06/2023")
-            
-            # Simulate tax document content
-            col1, col2 = st.columns(2)
-            with col1:
-                st.number_input("Revenus du mois 1 (€)", min_value=0.0, step=10.0)
-            with col2:
-                st.number_input("Revenus du mois 2 (€)", min_value=0.0, step=10.0)
-            
-            col3, col4 = st.columns(2)
-            with col3:
-                st.number_input("Revenus du mois 3 (€)", min_value=0.0, step=10.0)
-            with col4:
-                st.selectbox("Situation professionnelle", ["Salarié", "Auto-entrepreneur", "Sans activité", "Étudiant", "Retraité"])
-            
-            # Button to submit declaration
-            st.button("Soumettre ma déclaration")
+            st.write("**Statut:** Vérfié ✅")
+            st.write("**Émis par:** Digiposte")
+
+            # Simulate address verification process
+            if st.button("Télécharger mes bulletins de salaire"):
+                st.session_state["process_status"] = 66
+                st.success("Demande de bulletin de salaire envoyée. Notre service va traiter votre demande.")
+                st.rerun()
+        
         
         # Close highlight div if needed
         if section == "documents":
@@ -542,30 +532,12 @@ with tab2:
         if section == "simulation":
             st.markdown('<div class="highlight-section">', unsafe_allow_html=True)
         
-        with st.expander("📊 Simulation de droits"):
-            st.write("**Statut:** Disponible ✅")
-            st.write("**Description:** Simulez vos droits aux prestations CAF")
-            
-            # Simple simulation form
-            st.selectbox("Situation familiale", ["Célibataire", "En couple", "Famille monoparentale", "Colocation"])
-            st.number_input("Nombre d'enfants à charge", min_value=0, max_value=10)
-            st.number_input("Revenu mensuel du foyer (€)", min_value=0.0, step=100.0)
-            st.number_input("Loyer mensuel (€)", min_value=0.0, step=50.0)
-            
-            # Button to run simulation
-            if st.button("Lancer la simulation"):
-                st.success("D'après nos estimations, vous pourriez bénéficier des aides suivantes :")
-                st.metric("Aide personnalisée au logement (APL)", "320,45 €/mois")
-                st.metric("Prime d'activité", "175,30 €/mois")
-        
-        # Close highlight div if needed
-        if section == "simulation":
-            st.markdown('</div>', unsafe_allow_html=True)
+
 
 # Button to complete the process (for demonstration)
 if st.session_state["process_status"] >= 33 and st.session_state["process_status"] < 100:
-    if st.button("Finaliser la vérification de mes documents"):
-        st.session_state["process_status"] = 100
+    if st.button("Signer ma demande de prestation"):
+        st.session_state["process_status"] = 66
         st.balloons()
         st.success("Tous vos documents ont été vérifiés avec succès !")
         st.rerun() 
